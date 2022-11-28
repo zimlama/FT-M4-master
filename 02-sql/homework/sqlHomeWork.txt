@@ -1,0 +1,53 @@
+--Buscá todas las películas filmadas en el año que naciste.
+
+SELECT * FROM movies WHERE year=1961;
+
+--Cuantas películas hay en la DB que sean del año 1982?
+
+SELECT COUNT(*) FROM movies WHERE year=1982;
+
+
+--Buscá actores que tengan el substring stack en su apellido.
+SELECT * FROM actors WHERE last_name LIKE '%stack%';
+
+--Buscá los 10 nombres y apellidos más populares entre los actores. Cuantos actores tienen cada uno de esos nombres y apellidos? ENVIO A LOWER PARA QUE NO CUENTE DISTINTO UN UPPER DE UN LOWER
+SELECT first_name, last_name, COUNT(*) AS repetidos
+FROM actors
+GROUP BY LOWER(first_name), LOWER(last_name)
+ORDER BY repetidos DESC
+LIMIT 10;
+
+--Listá el top 100 de actores más activos junto con el número de roles que haya realizado.
+SELECT a.first_name, a.last_name, COUNT(*) as cantidad 
+FROM actors as a
+JOIN roles as r
+ON a.id = r.actor_id 
+GROUP BY a.id
+ORDER BY cantidad DESC
+LIMIT 100;
+
+-- Cuantas películas tiene IMDB por género? Ordená la lista por el género menos popular.
+SELECT g.genre, COUNT(*) as cantidad 
+FROM movies_genres as g
+GROUP BY g.genre
+ORDER BY cantidad DESC;
+
+--Listá el nombre y apellido de todos los actores que trabajaron en la película "Braveheart" de 1995, ordená la lista alfabéticamente por apellido.
+
+SELECT a.first_name, a.last_name FROM actors as a
+JOIN roles as r ON a.id = r.actor_id
+JOIN movies as m ON r.movie_id = m.id
+WHERE m.name = 'Braveheart' AND m.year = 1995
+ORDER BY a.last_name;
+
+
+--Listá todos los directores que dirigieron una película de género 'Film-Noir' en un año bisiesto (para reducir la complejidad, asumí que cualquier año divisible por cuatro es bisiesto). Tu consulta debería devolver el nombre del director, el nombre de la peli y el año. Todo ordenado por el nombre de la película.
+-- directors -- movies_directors --- movies genres -- movies - sacar el genero que buscamos y el año
+
+SELECT d.first_name, d.last_name, m.name, m.year FROM directors as d
+JOIN movies_directors as md ON d.id = md.director_id
+JOIN movies_genres as g ON md.movie_id = g.movie_id
+JOIN movies as m ON g.movie_id = m.id
+WHERE g.genre = 'Film-Noir' AND m.year%4 = 0
+ORDER BY m.name;
+
